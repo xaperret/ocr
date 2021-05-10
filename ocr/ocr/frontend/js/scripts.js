@@ -1,10 +1,16 @@
 /**
- * GLOBAL VARIABLE
+ * ! GLOBAL VARIABLE !
  */
-const CANVAS_SIZE = 20;
+const canvasSize = 20;
+const canvasId = "canvasOCR";
+var canvasOCR = document.createElement("canvas");
+canvasOCR.id = canvasId;
+const ctx = canvasOCR.getContext("2d");
+var coords = { x: 0, y: 0 };
+var step = 0;
 
 /**
- * FUNCTIONS
+ * ! FUNCTIONS !
  */
 
 /**
@@ -16,33 +22,53 @@ const CANVAS_SIZE = 20;
  * @returns a number close to original size that is divisible by 20
  */
 function makeDivisibleBy20(size) {
+  console.log("generating canvas");
   size = size - (size % 10);
   size = size + ((size / 10) % 2);
   return size;
 }
 
-function drawSquare(eventObj, ctx, length) {
+function refreshCoords(e) {
+  coords.x = e.clientX - canvasOCR.offsetLeft;
+  coords.y = e.clientY - canvasOCR.offsetTop;
+  console.log(e);
+}
+
+function startDrawing(e) {
+  document.addEventListener("mousemove", drawSquare);
+  refreshCoords(e);
+  drawSquare();
+}
+
+function endDrawing() {
+  document.removeEventListener("mousemove", drawSquare);
+}
+
+function resizeDrawing(e) {}
+
+function drawSquare(color = "black") {
+  ctx.fillStyle = color;
+  let x = Math.floor(coords.x / step) * step;
+  let y = Math.floor(coords.y / step) * step;
+  console.log("drawSquare -> drawing at x:", x, " y:", y, " step:", step);
+  ctx.fillRect(x, y, step, step);
+}
+
+function draw(event) {
   ctx.beginPath();
-  coords = findSquare(eventObj, length);
-  console.log("after", coords);
-  ctx.rect(coords[0], coords[1], length, length);
-  ctx.fill();
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#ACD3ED";
+  ctx.moveTo(coords.x, coords.y);
+  refreshCoords(event);
+  ctx.lineTo(coords.x, coords.y);
+  ctx.stroke();
 }
-
-function findSquare(eventObj, step, squareSize) {
-  let coords = [];
-
-  console.log("before", eventObj);
-
-  coords.push(Math.round(squareSize / (eventObj.x / step)));
-  coords.push(Math.round(squareSize / (eventObj.y / step)));
-  return coords;
-}
-
 /**
- * MAIN
+ * ! MAIN !
  */
 
+/**  ! CANVAS CREATION !  */
 // Get browser size
 const vw = Math.max(
   document.documentElement.clientWidth || 0,
@@ -52,10 +78,6 @@ const vh = Math.max(
   document.documentElement.clientHeight || 0,
   window.innerHeight || 0
 );
-
-// create element canvas and append it to main
-let canvasOCR = document.createElement("canvas");
-canvasOCR.id = "canvasOCR";
 
 if (vw > vh) {
   canvasOCR.width = makeDivisibleBy20(0.9 * vh);
@@ -67,14 +89,11 @@ if (vw > vh) {
 
 document.querySelector("main").append(canvasOCR);
 
-var c = document.getElementById("canvasOCR");
-var ctx = c.getContext("2d");
-
-let step = canvasOCR.width / CANVAS_SIZE;
+step = canvasOCR.width / canvasSize;
 let hSquare = 0;
 let wSquare = 0;
 
-for (let i = 0; i <= canvasOCR.width; i = i + step) {
+for (let i = 0; i < canvasOCR.width + 1; i = i + step) {
   hSquare = canvasOCR.height;
   wSquare = canvasOCR.width;
 
@@ -87,8 +106,6 @@ for (let i = 0; i <= canvasOCR.width; i = i + step) {
   ctx.stroke();
 }
 
-// canvasOCR.addEventListener("mouseover", (e) => drawSquare(e, ctx, step));
-
-canvasOCR.addEventListener("mousedown", (e) => drawSquare(e, ctx, step));
-
-// canvasOCR.addEventListener("mouseup", (e) => drawSquare(e, 0));
+canvasOCR.addEventListener("mousedown", (e) => startDrawing(e));
+canvasOCR.addEventListener("mouseup", endDrawing);
+//canvasOCR.addEventListener("resize", (e) => resizeDrawing(e));

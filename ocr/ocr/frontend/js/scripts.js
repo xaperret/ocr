@@ -61,6 +61,33 @@ function drawSquare(color = "black") {
   ctx.fillRect(x, y, step, step);
 }
 
+function clearDrawing() {
+  let step = canvasOCR.width / canvasSize;
+  for (let i = 0; i < canvasOCR.width; i = i + step) {
+    for (let j = 0; j < canvasOCR.height; j = j + step) {
+      coords.x = i;
+      coords.y = j;
+      drawSquare("white");
+    }
+  }
+
+  let hSquare = 0;
+  let wSquare = 0;
+
+  for (let i = 0; i < canvasOCR.width + 1; i = i + step) {
+    hSquare = canvasOCR.height;
+    wSquare = canvasOCR.width;
+
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i, hSquare);
+    ctx.stroke();
+
+    ctx.moveTo(0, i);
+    ctx.lineTo(wSquare, i);
+    ctx.stroke();
+  }
+}
+
 function draw(event) {
   ctx.beginPath();
   ctx.lineWidth = 5;
@@ -76,6 +103,39 @@ function draw(event) {
  */
 
 /**  ! CANVAS CREATION !  */
+let c = document.createElement("div");
+c.appendChild(canvasOCR);
+c.className = "container";
+
+let form = document.createElement("form");
+c.appendChild(form);
+form.className = "container";
+form.setAttribute("action", "../../backend/api.js");
+
+let formBtnSubmit = document.createElement("input");
+form.appendChild(formBtnSubmit);
+formBtnSubmit.className = "btn";
+formBtnSubmit.setAttribute("type", "submit");
+
+let formBtnClear = document.createElement("input");
+form.appendChild(formBtnClear);
+formBtnClear.className = "btn";
+formBtnClear.setAttribute("type", "button");
+formBtnClear.setAttribute("value", "Clear");
+formBtnClear.setAttribute("onclick", "clearDrawing()");
+
+let formTextBox = document.createElement("input");
+form.appendChild(formTextBox);
+formTextBox.setAttribute(
+  "value",
+  "What character did you draw ? (fill to train model, leave empty otherwise)"
+);
+formTextBox.className = "textbox";
+formTextBox.setAttribute("type", "text");
+formTextBox.addEventListener("focus", (e) =>
+  formTextBox.setAttribute("value", "")
+);
+
 // Get browser size
 const vw = Math.max(
   document.documentElement.clientWidth || 0,
@@ -94,7 +154,7 @@ if (vw > vh) {
   canvasOCR.height = makeDivisibleBy20(0.9 * vw);
 }
 
-document.querySelector("main").append(canvasOCR);
+document.querySelector("main").append(c);
 
 step = canvasOCR.width / canvasSize;
 let hSquare = 0;

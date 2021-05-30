@@ -11,6 +11,13 @@ const ctx = canvasOCR.getContext("2d");
 var coords = { x: 0, y: 0 };
 var step = 0;
 
+var matrixOCR = new Array(canvasSize); // initializing matrix
+for (let i = 0; i < canvasSize; i++) {
+  // 2d matrix
+  matrixOCR[i] = new Array(canvasSize);
+  matrixOCR[i].fill(0);
+}
+
 /**
  * ! FUNCTIONS !
  */
@@ -59,6 +66,13 @@ function drawSquare(color = "black") {
   let y = Math.floor(coords.y / step) * step;
   console.log("drawSquare -> drawing at x:", x, " y:", y, " step:", step);
   ctx.fillRect(x, y, step, step);
+  console.log(
+    "drawSquare -> changing state of matrixOCR at ",
+    y / step,
+    ":",
+    x / step
+  );
+  matrixOCR[y / step][x / step] = 1;
 }
 
 function clearDrawing() {
@@ -86,6 +100,27 @@ function clearDrawing() {
     ctx.lineTo(wSquare, i);
     ctx.stroke();
   }
+  clearMatrix(matrixOCR);
+}
+
+function printMatrix(mat) {
+  let s = "";
+  let i = 0;
+  mat.forEach((element) => {
+    s = i.toString() + " => ";
+    element.forEach((element) => {
+      s += " " + element.toString();
+    });
+    console.log(s);
+    i++;
+  });
+}
+
+function clearMatrix(mat) {
+  console.log("Matrix cleared");
+  mat.forEach((element) => {
+    element.fill(0);
+  });
 }
 
 function draw(event) {

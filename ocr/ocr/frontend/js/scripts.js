@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 /**
  * ! GLOBAL VARIABLE !
  */
@@ -35,13 +37,18 @@ function refreshCoords(e) {
 }
 
 function startDrawing(e) {
-  document.addEventListener("mousemove", drawSquare);
+  document.addEventListener("mousemove", mouseIsMoving);
+  refreshCoords(e);
+  drawSquare();
+}
+
+function mouseIsMoving(e) {
   refreshCoords(e);
   drawSquare();
 }
 
 function endDrawing() {
-  document.removeEventListener("mousemove", drawSquare);
+  document.removeEventListener("mousemove", mouseIsMoving);
 }
 
 function resizeDrawing(e) {}

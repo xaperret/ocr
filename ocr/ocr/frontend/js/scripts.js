@@ -22,6 +22,32 @@ for (let i = 0; i < canvasSize; i++) {
  * ! FUNCTIONS !
  */
 
+function sendToApi(method) {
+  let apiCall = "";
+  if (method === "train") {
+    apiCall = "/train";
+  } else {
+    apiCall = "/predict";
+  }
+  fetch(apiCall, {
+    method: "PUT",
+    body: { data: matrixOCR },
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        // ***
+        throw new Error("HTTP error " + response.status); // ***
+      } // ***
+      // ...use `response.json`, `response.text`, etc. here
+    })
+    .catch((error) => {
+      // ...handle/report error
+    });
+}
+
 /**
  * Function that takes a number and return a close number that is divisible by 20
  *
@@ -151,6 +177,7 @@ let formBtnSubmit = document.createElement("input");
 form.appendChild(formBtnSubmit);
 formBtnSubmit.className = "btn";
 formBtnSubmit.setAttribute("type", "submit");
+formBtnSubmit.setAttribute("onClick", "sendToApi()");
 
 let formBtnClear = document.createElement("input");
 form.appendChild(formBtnClear);

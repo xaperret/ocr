@@ -11,6 +11,7 @@ from starlette.responses import FileResponse
 
 import image_recognition as ir
 
+
 app = FastAPI(title='TP de vision numérique')
 
 
@@ -18,30 +19,41 @@ class Item(BaseModel):
     content: List[List[int]]
 
 
+try:
+    os.mkdir('datasets')
+    os.mkdir('models')
+except FileExistsError:
+    print("Dossier déjà créer, l'erreur est ignorable")
+
+try:
+    model = ir.load_model('model.json')
+except FileNotFoundError:
+    print("Le modèle n'a pas été trouvé dans les fichiers")
+    print("Ce n'est pas une erreur grave si c'est le premier lancement")
+
+
 @app.get("/")
 async def read_root():
     return FileResponse('frontend/index.html')
 
 
-@app.get("/train")
-def read_item():
-    return {"hello": "world"}
-
-
-@app.put("/train")
-def update_item():
-    return {"hello": "world"}
-
-
-@app.post('/train')
-async def train(item: Item):
+@app.post('/add')
+async def add(item: Item):
     print(item)
     return item
 
 
+@app.post('/train')
+def train():
+    print("Training model from images list")
+    return
+
+
 @app.post('/predict')
-def predict(data):
-    return "bim"
+async def predict(item: Item):
+    print("Trying to predict image using model")
+    print(item)
+    return item
 
 
 if __name__ == '__main__':

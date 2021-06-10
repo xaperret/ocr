@@ -16,6 +16,7 @@ app = FastAPI(title='TP de vision numérique')
 
 
 class Item(BaseModel):
+    title: str
     content: List[List[int]]
 
 
@@ -39,7 +40,8 @@ async def read_root():
 
 @app.post('/add')
 async def add(item: Item):
-    print(item)
+    ir.unload_image(item.content, item.title)
+
     return item
 
 

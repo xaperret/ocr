@@ -3,6 +3,10 @@
 /**
  * ! GLOBAL VARIABLE !
  */
+/* ! API RELATED ! */
+const apiURL = "http://127.0.0.1:8000";
+
+/* ! CANVAS RELATED ! */
 const canvasSize = 20;
 const canvasId = "canvasOCR";
 var canvasOCR = document.createElement("canvas");
@@ -21,31 +25,38 @@ for (let i = 0; i < canvasSize; i++) {
 /**
  * ! FUNCTIONS !
  */
+function addImage() {
+  let apiCall = apiURL + "/add";
+  console.log("Making request to ", apiCall);
 
-function sendToApi(method) {
-  let apiCall = "";
-  if (method === "train") {
-    apiCall = "/train";
-  } else {
-    apiCall = "/predict";
-  }
+  let data = { content: matrixOCR };
+  console.log("Containing ", data);
+
   fetch(apiCall, {
-    method: "PUT",
-    body: { data: matrixOCR },
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        // ***
-        throw new Error("HTTP error " + response.status); // ***
-      } // ***
-      // ...use `response.json`, `response.text`, etc. here
-    })
-    .catch((error) => {
-      // ...handle/report error
-    });
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+function trainModel() {
+  let apiCall = apiURL + "/train";
+  console.log("Making request to ", apiCall);
+
+  fetch(apiCall, {
+    method: "POST",
+  });
+}
+
+function predictFromModel() {
+  let apiCall = apiURL + "/predict";
+  console.log("Making request to ", apiCall);
+
+  let data = { content: matrixOCR };
+  console.log("Containing ", data);
+
+  fetch(apiCall, {
+    method: "POST",
+  });
 }
 
 /**
@@ -173,25 +184,51 @@ c.appendChild(form);
 form.className = "container";
 form.setAttribute("action", "../../backend/api.js");
 
-let formBtnSubmit = document.createElement("input");
-form.appendChild(formBtnSubmit);
-formBtnSubmit.className = "btn";
-formBtnSubmit.setAttribute("type", "submit");
-formBtnSubmit.setAttribute("onClick", "sendToApi()");
+let formBtnAddImage = document.createElement("input");
+form.appendChild(formBtnAddImage);
+formBtnAddImage.className = "btn";
+formBtnAddImage.setAttribute("type", "button");
+formBtnAddImage.setAttribute("value", "Envoyer");
+formBtnAddImage.setAttribute("onClick", "addImage()");
+
+let formBtnTrain = document.createElement("input");
+form.appendChild(formBtnTrain);
+formBtnTrain.className = "btn";
+formBtnTrain.setAttribute("type", "button");
+formBtnTrain.setAttribute("value", "Entrainer");
+formBtnTrain.setAttribute("onClick", "trainModel()");
+
+let formBtnEvaluate = document.createElement("input");
+form.appendChild(formBtnEvaluate);
+formBtnEvaluate.className = "btn";
+formBtnEvaluate.setAttribute("type", "button");
+formBtnEvaluate.setAttribute("value", "Evaluer");
+formBtnEvaluate.setAttribute("onClick", "predictFromModel()");
 
 let formBtnClear = document.createElement("input");
 form.appendChild(formBtnClear);
 formBtnClear.className = "btn";
 formBtnClear.setAttribute("type", "button");
-formBtnClear.setAttribute("value", "Clear");
+formBtnClear.setAttribute("value", "Effacer dessin");
 formBtnClear.setAttribute("onclick", "clearDrawing()");
+
+let formBtnClearModels = document.createElement("input");
+form.appendChild(formBtnClearModels);
+formBtnClearModels.className = "btn";
+formBtnClearModels.setAttribute("type", "button");
+formBtnClearModels.setAttribute("value", "Effacer modèle");
+formBtnClearModels.setAttribute("onclick", "clearDrawing()");
+
+let formBtnLoad = document.createElement("input");
+form.appendChild(formBtnLoad);
+formBtnLoad.className = "btn";
+formBtnLoad.setAttribute("type", "button");
+formBtnLoad.setAttribute("value", "Charger les datasets");
+formBtnLoad.setAttribute("onclick", "clearDrawing()");
 
 let formTextBox = document.createElement("input");
 form.appendChild(formTextBox);
-formTextBox.setAttribute(
-  "value",
-  "What character did you draw ? (fill to train model, leave empty otherwise)"
-);
+formTextBox.setAttribute("value", "Caractère");
 formTextBox.className = "textbox";
 formTextBox.setAttribute("type", "text");
 formTextBox.addEventListener("focus", (e) =>

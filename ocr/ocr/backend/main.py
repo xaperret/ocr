@@ -11,7 +11,6 @@ from starlette.responses import FileResponse
 
 import image_recognition as ir
 
-
 app = FastAPI(title='TP de vision numérique')
 
 
@@ -33,15 +32,9 @@ except FileNotFoundError:
     print("Ce n'est pas une erreur grave si c'est le premier lancement")
 
 
-@app.get("/")
-async def read_root():
-    return FileResponse('frontend/index.html')
-
-
 @app.post('/add')
 async def add(item: Item):
-    ir.unload_image(item.content, item.title)
-
+    res = ir.unload_image(item.content, item.title)
     return item
 
 
@@ -60,4 +53,3 @@ async def predict(item: Item):
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
-    app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")

@@ -14,7 +14,8 @@ __email__ = "xavier.perret@etu.hesge.ch"
 __date__ = "12/06/2021"
 
 FILEPATH_DATASETS: str = 'datasets'
-FILEPATH_MODEL: str = 'model'
+FOLDER_MODEL: str = 'model'
+FILENAME_MODEL: str = 'model.json'
 STEP = 20
 CHARACTER_LIST = "0123456789"
 

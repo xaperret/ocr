@@ -45,6 +45,18 @@ def print_list(character: str, list_element: List[int]) -> None:
         print(list_element[i:i+STEP], ' taille => ', i)
 
 
+def print_list_tuple(training_material: List[Tuple[str, List[int]]]) -> None:
+    """ Print given list of tuples containing the symbol and the data representing
+    the symbol
+
+    Params
+    training_material -- is the list of tuples
+    """
+    print("print_list_tuple")
+    for i, element in enumerate(training_material):
+        print("  -> print_list_tuple element number ", i, " => ", element)
+
+
 def matrix_2_list(matrix: List[List[int]]) -> List[int]:
     """ Convert 2d matrix into one list and returns it 
 
@@ -61,6 +73,8 @@ def matrix_2_list(matrix: List[List[int]]) -> List[int]:
 def load_model(filepath: str = '') -> None:
     """ Load and return given model
 
+    TODO this shit
+
     Params
     filepath -- path to the given model to load
     """
@@ -76,6 +90,8 @@ def load_model(filepath: str = '') -> None:
 
 def unload_model(model_to_unload, filepath: str = 'model.json') -> None:
     """ Unload model into given filepath
+
+    TODO this shit
 
     Params
     model_to_unload -- keras model to save
@@ -99,16 +115,17 @@ def load_images() -> List[Tuple[str, List[int]]]:
     the character of the given symbol
     """
     print("load_images")
-    training_material: List[Tuple[str, List[int]]]
+    training_material: List[Tuple[str, List[int]]] = []
     images_list: List[List[int]]
     filepath: str = ""
     for i, character in enumerate(CHARACTER_LIST):
-        print(" -> number ", i, " character ", character)
+        print("  load_images -> number ", i, " character ", character)
         filepath = FILEPATH_DATASETS + '/' + character + '.json'  # datatsets/0.json
         images_list = load_image(filepath)  # load list of images of filepath
         for element in images_list:
-            if(not element):  # list not empty
-                training_material.append(zip(character, element))
+            if(element):  # list not empty
+                print("    load_images -> adding ", character, element)
+                training_material.append((character, element))
 
     return training_material
 

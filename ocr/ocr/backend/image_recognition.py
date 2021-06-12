@@ -51,6 +51,7 @@ def matrix_2_list(matrix: List[List[int]]) -> List[int]:
     Params
     matrix -- given 2d matrix to convert
     """
+    print("matrix_2_list")
     new_list: List[int] = []
     for i in matrix:
         new_list += i
@@ -63,12 +64,13 @@ def load_model(filepath: str = '') -> None:
     Params
     filepath -- path to the given model to load
     """
+    print("load_model")
     if(filepath == ''):
         model = tf.keras.applications.MobileNetV2(weights="imagenet")
     else:
         with open(filepath, 'r') as f:
             model = model_from_json(f.read())
-    print("Chargement du modèle")
+    print(" -> Chargement du modèle")
     return model
 
 
@@ -79,7 +81,8 @@ def unload_model(model_to_unload, filepath: str = 'model.json') -> None:
     model_to_unload -- keras model to save
     filepath -- place to save the model
     """
-    print("Déchargement du modèle dans fichier ", filepath,
+    print("unload_model")
+    print(" -> Déchargement du modèle dans fichier ", filepath,
           ", dossier ", FILEPATH_DATASETS + filepath)
     filepath = FILEPATH_DATASETS + filepath
     if(model_to_unload is not None):
@@ -95,15 +98,17 @@ def load_images() -> List[Tuple[str, List[int]]]:
     the name of a file in datasets will be 'a.json' where a is 
     the character of the given symbol
     """
+    print("load_images")
     training_material: List[Tuple[str, List[int]]]
     images_list: List[List[int]]
     filepath: str = ""
     for i, character in enumerate(CHARACTER_LIST):
-        print("number ", i, " character ", character)
+        print(" -> number ", i, " character ", character)
         filepath = FILEPATH_DATASETS + '/' + character + '.json'  # datatsets/0.json
         images_list = load_image(filepath)  # load list of images of filepath
         for element in images_list:
-            training_material.append(zip(character, element))
+            if(not element):  # list not empty
+                training_material.append(zip(character, element))
 
     return training_material
 
@@ -114,12 +119,19 @@ def load_image(filepath: str = '') -> List[List[int]]:
     Params
     filepath -- place to look for the file
     """
+    print("load_image")
     drawings_data: List[List[int]]
     if(not os.path.exists(filepath)):
         print('error load_image, file does not exist')
         return [[]]
+    with open(filepath, 'r') as f:
+        json_drawings = json.load(f)
+        drawings_data = json_drawings
+        f.close()  # normally useless but too much bug recently so...
 
-    return []
+    print(" -> toutes les données chargés du charactère de ", filepath)
+    print(" -> liste de liste ", drawings_data)
+    return drawings_data
 
 
 def unload_image(matrix: List[List[int]], character: str = '0') -> None:
@@ -129,6 +141,7 @@ def unload_image(matrix: List[List[int]], character: str = '0') -> None:
     matrix -- 2d list of integer to append to file
     character --
     """
+    print("unload_image")
     filepath = FILEPATH_DATASETS + '/' + character + '.json'
     if(not os.path.exists(FILEPATH_DATASETS)):
         print("Dossier n'existe pas")

@@ -98,28 +98,53 @@ function endDrawing() {
 
 function resizeDrawing(e) {}
 
-function drawSquare(color = "black") {
+function drawSquare(color = "black", xPixel = -1, yPixel = -1) {
+  console.log("drawSquare called ");
+
   ctx.fillStyle = color;
-  let x = Math.floor(coords.x / step) * step;
-  let y = Math.floor(coords.y / step) * step;
-  console.log("drawSquare -> drawing at x:", x, " y:", y, " step:", step);
+  let x = 0;
+  let y = 0;
+  if (xPixel < 0 || yPixel < 0) {
+    x = Math.floor(coords.x / step) * step;
+    y = Math.floor(coords.y / step) * step;
+  } else {
+    x = Math.floor(xPixel * step);
+    y = Math.floor(yPixel * step);
+  }
+  if (x < 0 || y < 0) {
+    console.log(" -> mouse out of bounds");
+    return;
+  }
+
+  console.log(" -> drawing at x:", x, " y:", y, " step:", step);
   ctx.fillRect(x, y, step, step);
-  console.log(
-    "drawSquare -> changing state of matrixOCR at ",
-    y / step,
-    ":",
-    x / step
-  );
-  matrixOCR[y / step][x / step] = 1;
+
+  let col = y / step;
+  let li = x / step;
+  console.log(" -> changing state of matrixOCR at ", col, ":", li);
+  col = Math.round(col);
+  li = Math.round(li);
+  if (li >= canvasSize) {
+    li = canvasSize - 1;
+  }
+  if (col >= canvasSize) {
+    col = canvasSize - 1;
+  }
+  if (li < 0) {
+    li = 0;
+  }
+  if (col < 0) {
+    col = 0;
+  }
+
+  console.log(" -> rounded values ", col, ":", li);
+  matrixOCR[col][li] = 1;
 }
 
 function clearDrawing() {
-  let step = canvasOCR.width / canvasSize;
-  for (let i = 0; i < canvasOCR.width; i = i + step) {
-    for (let j = 0; j < canvasOCR.height; j = j + step) {
-      coords.x = i;
-      coords.y = j;
-      drawSquare("white");
+  for (let i = 0; i < canvasSize; i++) {
+    for (let j = 0; j < canvasSize; j++) {
+      drawSquare("white", i, j);
     }
   }
 
@@ -149,6 +174,7 @@ function printMatrix(mat) {
     element.forEach((element) => {
       s += " " + element.toString();
     });
+    s = s + mat[i].length.toString();
     console.log(s);
     i++;
   });
@@ -159,6 +185,7 @@ function clearMatrix(mat) {
   mat.forEach((element) => {
     element.fill(0);
   });
+  printMatrix(mat);
 }
 
 function draw(event) {
@@ -282,4 +309,5 @@ for (let i = 0; i < canvasOCR.width + 1; i = i + step) {
 
 canvasOCR.addEventListener("mousedown", (e) => startDrawing(e));
 canvasOCR.addEventListener("mouseup", endDrawing);
+canvasOCR.addEventListener("focusout", endDrawing);
 //canvasOCR.addEventListener("resize", (e) => resizeDrawing(e));

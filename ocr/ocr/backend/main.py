@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""Main module providing routes and server
+
+"""
+
 import os
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -10,8 +14,16 @@ from pydantic import BaseModel
 from starlette.responses import FileResponse
 
 import image_recognition as ir
+import image_prediction as ip
 
-app = FastAPI(title='TP de vision numérique')
+__author__ = "Xavier Perret"
+__email__ = "xavier.perret@etu.hesge.ch"
+__date__ = "12/06/2021"
+
+FOLDER_MODEL: str = 'model'
+FILENAME_MODEL: str = 'model.json'
+
+app = FastAPI(title='TP3 de vision numérique')
 
 
 class Item(BaseModel):
@@ -38,7 +50,15 @@ async def add(item: Item):
 
 @app.post('/train')
 def train():
-    print("Training model from images list")
+    print("ROUTES => app. post/train")
+    print("  -> Training model from images list")
+    training_list = ir.load_images()
+    print("  -> Result from load_images", )
+    ir.print_list_tuple(training_list)
+    features, labels = ip.get_features_labels(training_list)
+    # TODO check if existing model
+    model = tf.keras.Sequential()
+    model = ip.train(labels, features)
     return
 
 

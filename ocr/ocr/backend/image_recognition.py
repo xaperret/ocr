@@ -3,8 +3,9 @@ from tensorflow.keras.applications.imagenet_utils import decode_predictions
 from keras.models import model_from_json
 from typing import Optional, List, Set, Dict, Tuple
 import json
+import os
 
-filepathDatasets: str = 'datasets/'
+filepathDatasets: str = 'datasets'
 
 
 def print_matrix(character: str, matrix: List[List[int]]):
@@ -41,7 +42,7 @@ def unload_model(model_to_unload, filepath: str = 'model.json'):
           ", dossier ", filepathDatasets + filepath)
     filepath = filepathDatasets + filepath
     if(model_to_unload is not None):
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w+') as f:
             f.write(model_to_unload)
     else:
         print("Problème avec le modèle")
@@ -63,19 +64,31 @@ def load_images(filepath: str = '') -> List[List[int]]:
     return [[]]
 
 
-def unload_image(matrix: List[List[int]], character: str = '0') -> bool:
-    """ Unload image to a file
+def unload_image(matrix: List[List[int]], character: str = '0') -> None:
+    """ Unload image to a json file
 
     Params
     matrix --
     character --
     """
+    filepath = filepathDatasets + '/' + character + '.json'
+    if(not os.path.exists(filepathDatasets)):
+        print("Dossier n'existe pas")
+        os.mkdir(filepathDatasets)
+    if(not os.path.exists(filepath)):
+        print("Fichier n'existe pas")
+        with open(filepath, mode='w+') as f:
+            json.dump([], f)
+            f.close()
+
     print_matrix(character, matrix)
-    #filepath = filepathDatasets + '/' + character + '.json'
-    #jsonImages = json.dumps(matrix)
-    # with open(filepath) as f:
-    #    f.write(jsonImages)
-    return True
+    jsonImages = json.dumps(matrix)
+    with open(filepath, 'r+') as new_file:
+        previousData = json.load(new_file)
+        previousData.append(jsonImages)
+        new_file.seek(0)
+        json.dump(previousData, new_file)
+        new_file.close()
 
 
 def predict(matrix: List[List[int]], model):

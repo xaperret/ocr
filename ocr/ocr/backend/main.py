@@ -20,7 +20,6 @@ class Item(BaseModel):
 
 
 try:
-    os.mkdir('datasets')
     os.mkdir('models')
 except FileExistsError:
     print("Dossier déjà créer, l'erreur est ignorable")
@@ -35,7 +34,6 @@ except FileNotFoundError:
 @app.post('/add')
 async def add(item: Item):
     res = ir.unload_image(item.content, item.title)
-    return item
 
 
 @app.post('/train')

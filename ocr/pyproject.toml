@@ -11,6 +11,9 @@ mypy = "^0.812"
 keras = "^2.4.3"
 tensorflow = "^2.5.0"
 uvicorn = "^0.14.0"
+aiofiles = "^0.7.0"
+Jinja2 = "^3.0.1"
+pydantic = "^1.8.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

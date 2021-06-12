@@ -2,8 +2,17 @@ import tensorflow as tf
 from tensorflow.keras.applications.imagenet_utils import decode_predictions
 from keras.models import model_from_json
 from typing import Optional, List, Set, Dict, Tuple
+import json
 
 filepathDatasets: str = 'datasets/'
+
+
+def print_matrix(character: str, matrix: List[List[int]]):
+    """ Print character and matrix
+    """
+    print("Ajout de donnée pour le charactère ", character)
+    for i in matrix:
+        print(i)
 
 
 def load_model(filepath: str = ''):
@@ -61,7 +70,11 @@ def unload_image(matrix: List[List[int]], character: str = '0') -> bool:
     matrix --
     character --
     """
-    filepath = filepathDatasets + '/' + character + '.json'
+    print_matrix(character, matrix)
+    #filepath = filepathDatasets + '/' + character + '.json'
+    #jsonImages = json.dumps(matrix)
+    # with open(filepath) as f:
+    #    f.write(jsonImages)
     return True
 
 

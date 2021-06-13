@@ -55,10 +55,14 @@ def train():
     training_list = ir.load_images()
     print("  -> Result from load_images", )
     ir.print_list_tuple(training_list)
-    features, labels = ip.get_features_labels(training_list)
-    # TODO check if existing model
-    model = tf.keras.Sequential()
-    model = ip.train(labels, features)
+    labels, features = ip.get_features_labels(training_list)
+    labels, features = ip.convert_characters(labels, features)
+    model = ir.load_model()
+    if(model == None):
+        print("Model wasn't created, initiating model")
+        model = tf.keras.Sequential()
+        model = ip.train(labels, features)
+        # TODO train existing model
     return
 
 
@@ -67,6 +71,24 @@ async def predict(item: Item):
     print("Trying to predict image using model")
     print(item)
     return item
+
+
+@app.delete('/deleteModel')
+def delete_model():
+    print("Deleting models")
+    if(ir.delete_model()):
+        print("Model successfully deleted")
+    else:
+        print("Model already deleted or wrong path")
+
+
+@app.delete('/deleteDatasets')
+def delete_dataset():
+    print("Deleting dataset")
+    if(ir.delete_model()):
+        print("Datasets successfully deleted")
+    else:
+        print("Datasets already deleted or wrong path")
 
 
 if __name__ == '__main__':

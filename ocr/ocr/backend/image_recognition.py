@@ -77,7 +77,7 @@ def matrix_2_list(matrix: List[List[int]]) -> List[int]:
     return new_list
 
 
-def load_model(filepath: str = '') -> None:
+def load_model() -> None:
     """ Load and return given model
 
     TODO this shit
@@ -86,11 +86,8 @@ def load_model(filepath: str = '') -> None:
     filepath -- path to the given model to load
     """
     print("load_model")
-    filepath = FILEPATH_MODELS + '/' + filepath
-    if(not os.path.exists(filepath)):
-        print("  -> load_model: model does not exist or path is incorrect")
-        return None
-    model = keras.models.load_model(filepath)
+    filepath = FILEPATH_MODELS + '/' + MODEL_FILENAME
+    model = tf.keras.models.load_model('models.h5')
     return model
 
 

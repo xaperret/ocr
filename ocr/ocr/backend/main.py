@@ -3,8 +3,8 @@
 
 """
 
-import os
 from typing import Dict, List, Optional, Set, Tuple
+import numpy as np
 
 import tensorflow as tf
 import uvicorn
@@ -31,18 +31,6 @@ class Item(BaseModel):
     content: List[List[int]]
 
 
-try:
-    os.mkdir('models')
-except FileExistsError:
-    print("Dossier déjà créer, l'erreur est ignorable")
-
-try:
-    model = ir.load_model('model.json')
-except FileNotFoundError:
-    print("Le modèle n'a pas été trouvé dans les fichiers")
-    print("Ce n'est pas une erreur grave si c'est le premier lancement")
-
-
 @app.post('/add')
 async def add(item: Item):
     print("main.py => add -> received char ",
@@ -59,19 +47,10 @@ def train():
     print("ROUTES => app. post/train")
     print("  -> Training model from images list")
     training_list = ir.load_images()
-    print(training_list)
-    print(len(training_list))  # => list of tuple
-    print(len(training_list[0]))  # => tuple
-    print(len(training_list[0][0]))  # => char
-    print(len(training_list[0][1]))  # => list
     labels, features = ip.get_features_labels(training_list)
-    print(len(features))
-    print(len(features[0]))
-    print(len(features[1]))
-    #labels, features = ip.convert_characters(labels, features)
-    #model = tf.keras.Sequential()
-    #print("mes couilles", features.shape)
-    #model = ip.train(labels, features, model)
+    labels, features = ip.convert_characters(labels, features)
+    model = tf.keras.Sequential()
+    ip.train(labels, features, model)
     return
 
 
@@ -83,8 +62,16 @@ async def predict(item: Item):
     if(model == None):
         print("Model wasn't created, initiating model by calling train")
         train()
-        ip.predict(item)
-
+    features = ir.matrix_2_list(item.content)
+    print(len(features))
+    features = np.array(features)
+    features = np.reshape(features, [1, 400])
+    print(features.shape)
+    print(features)
+    res = model.predict(features)
+    for i in res:
+        for j, element in enumerate(i):
+            print(j, ':', element)
     return item
 
 

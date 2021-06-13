@@ -20,22 +20,13 @@ __author__ = "Xavier Perret"
 __email__ = "xavier.perret@etu.hesge.ch"
 __date__ = "12/06/2021"
 
-MODEL_FILENAME: str = 'wow_much_model'
+FILENAME_DATASETS: str = 'datasets.csv'
+FILEPATH_DATASETS: str = 'datasets'
 CANVAS_SIZE: int = 400
-NEURAL_NUMBER: int = 150
+NEURAL_NUMBER: int = 400
 CHARACTER_NUMBER: int = 10
 CHARACTER_LIST = "0123456789"
 EPOCHS: int = 3  # number of time we train model on our data set
-
-
-def predict(image_list: List[int], model) -> List[List[float]]:
-    """ Guess based on given matrix and model
-
-    Params
-    image_list -- 2d list of integer containing the value of the image
-    model --
-    """
-    return [[]]
 
 
 def get_features_labels(images_list: List[Tuple[str, List[int]]]) -> Tuple[List[str], List[List[int]]]:
@@ -90,9 +81,9 @@ def train(labels: np.ndarray, features: np.ndarray, model: tf.keras.Model) -> tf
     model --
     """
     print("train")
-    model.add(Dense(features.shape[1]))
-    model.add(Dense(NEURAL_NUMBER, activation='relu'))
-    model.add(Dense(CHARACTER_NUMBER, activation='softmax'))
+    model.add(keras.layers.InputLayer(features.shape[1]))
+    model.add(tf.keras.layers.Dense(NEURAL_NUMBER, activation='relu'))
+    model.add(tf.keras.layers.Dense(CHARACTER_NUMBER, activation='softmax'))
     model.compile(
         optimizer='adam', loss='mse', metrics=['accuracy'])
     print("  -> train summary")
@@ -100,6 +91,4 @@ def train(labels: np.ndarray, features: np.ndarray, model: tf.keras.Model) -> tf
     model.fit(x=features, y=labels, epochs=EPOCHS,
               batch_size=(features.shape[0]))
     model.summary()
-    ir.unload_model(model, MODEL_FILENAME)
-
-    return model
+    model.save('models.h5')

@@ -1,5 +1,5 @@
 /* jshint esversion: 6 */
-/* version 0.1 */
+/* version 0.9 */
 /**
  * ! GLOBAL VARIABLE !
  */
@@ -37,6 +37,8 @@ function addImage() {
     method: "POST",
     body: JSON.stringify(data),
   });
+
+  clearDrawing();
 }
 
 function trainModel() {
@@ -57,6 +59,25 @@ function predictFromModel() {
 
   fetch(apiCall, {
     method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+function deleteModel() {
+  let apiCall = apiURL + "/deleteModel";
+  console.log("Making request to ", apiCall);
+
+  fetch(apiCall, {
+    method: "DELETE",
+  });
+}
+
+function deleteDatasets() {
+  let apiCall = apiURL + "/deleteDatasets";
+  console.log("Making request to ", apiCall);
+
+  fetch(apiCall, {
+    method: "DELETE",
   });
 }
 
@@ -239,20 +260,6 @@ formBtnClear.className = "btn";
 formBtnClear.setAttribute("type", "button");
 formBtnClear.setAttribute("value", "Effacer dessin");
 formBtnClear.setAttribute("onclick", "clearDrawing()");
-
-let formBtnClearModels = document.createElement("input");
-form.appendChild(formBtnClearModels);
-formBtnClearModels.className = "btn";
-formBtnClearModels.setAttribute("type", "button");
-formBtnClearModels.setAttribute("value", "Effacer modèle");
-formBtnClearModels.setAttribute("onclick", "clearDrawing()");
-
-let formBtnLoad = document.createElement("input");
-form.appendChild(formBtnLoad);
-formBtnLoad.className = "btn";
-formBtnLoad.setAttribute("type", "button");
-formBtnLoad.setAttribute("value", "Charger les datasets");
-formBtnLoad.setAttribute("onclick", "clearDrawing()");
 
 let formRange = document.createElement("select");
 formRange.setAttribute("id", "range");

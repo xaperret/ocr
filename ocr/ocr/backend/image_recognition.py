@@ -22,7 +22,7 @@ FILEPATH_MODELS: str = 'model'  # don't put precious folder @see delete_model()
 FILENAME_MODEL: str = 'model.json'
 STEP = 20
 CHARACTER_LIST = "0123456789"
-HEADER_ROW: List[str] = ["Character"] + [str(i) for i in range(0, 20)]
+HEADER_ROW: List[str] = ["Character"] + [str(i) for i in range(0, 400)]
 
 
 def print_matrix(character: str, matrix: List[List[int]]) -> None:

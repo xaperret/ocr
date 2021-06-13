@@ -17,9 +17,10 @@ __author__ = "Xavier Perret"
 __email__ = "xavier.perret@etu.hesge.ch"
 __date__ = "12/06/2021"
 
+FILENAME_DATASETS: str = 'datasets.csv'
 FILEPATH_DATASETS: str = 'datasets'
 FILEPATH_MODELS: str = 'model'  # don't put precious folder @see delete_model()
-FILENAME_MODEL: str = 'model.json'
+FILENAME_MODEL: str = 'model'
 STEP = 20
 CHARACTER_LIST = "0123456789"
 HEADER_ROW: List[str] = ["Character"] + [str(i) for i in range(0, 400)]
@@ -115,41 +116,33 @@ def load_images() -> List[Tuple[str, List[int]]]:
     the character of the given symbol
     """
     print("load_images")
-    training_material: List[Tuple[str, List[int]]] = []
-    images_list: List[List[int]]
-    filepath: str = ""
-    for i, character in enumerate(CHARACTER_LIST):
-        filepath = FILEPATH_DATASETS + '/' + character + '.json'  # datatsets/0.json
-        images_list = load_image(filepath)  # load list of images of filepath
-        for element in images_list:
-            if(element):  # list not empty
-                training_material.append((character, element))
+    training_material: List[Tuple[str, List[int]]] = []  # output
+    image_list: List[int]
+    filepath: str = FILEPATH_DATASETS + '/' + FILENAME_DATASETS
+    character: str = ""
+    with open(filepath, 'r') as f:
+        csv_reader = csv.reader(f)
+        for i, line in enumerate(csv_reader):
+            if(i != 0):
+                character = line[0]
+                image_list = [int(i) for i in line]
+                image_list.pop(0)  # remove character
+                training_material.append((character, image_list))
 
     return training_material
 
 
-def load_image(filepath: str = '') -> List[List[int]]:
-    """ Load one given images from givenfile
-
-    Params
-    filepath -- place to look for the file
-    """
-    print("load_image")
-    drawings_data: List[List[int]] = []
-    if(not os.path.exists(filepath)):
-        print('error load_image, file does not exist')
-        return [[]]
-    return drawings_data
-
-
 def unload_image(drawing: List[int], character: str = '0') -> None:
-    """ Unload image to a json file
+    """ Unload given drawing representing character to a csv file inside datasets folder
+
+    If the datasets folder does not exist, it will be created
+    If the csv file does not exists it will create it and add HEADER_ROW
 
     Params
-    matrix -- 2d list of integer to append to file
-    character --
+    drawing -- list containing the data of the symbol drawn
+    character -- is the symbol the drawing is representing
     """
-    print("unload_image")
+    print("image_recognition.py => unload_image")
     filepath = FILEPATH_DATASETS + '/' + 'datasets.csv'
     data: List[str] = []
     if(not os.path.exists(FILEPATH_DATASETS)):
@@ -165,7 +158,6 @@ def unload_image(drawing: List[int], character: str = '0') -> None:
         writer = csv.writer(f)
         drawing_str = list(map(str, drawing))
         data = [character] + drawing_str
-        print("unload_image -> adding data:\n", data)
         writer.writerow(data)
 
 

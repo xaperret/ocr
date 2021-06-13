@@ -2,19 +2,22 @@
 """Provide tools to do crud operations on files containing either images or models and provide function to connect backend and keras
 """
 
-import tensorflow as tf
-from tensorflow.keras.applications.imagenet_utils import decode_predictions
-from keras.models import model_from_json
-from typing import Optional, List, Set, Dict, Tuple
 import json
 import os
+import shutil
+from typing import Dict, List, Optional, Set, Tuple
+
+import tensorflow as tf
+from keras.models import model_from_json
+from tensorflow import keras
+from tensorflow.keras.applications.imagenet_utils import decode_predictions
 
 __author__ = "Xavier Perret"
 __email__ = "xavier.perret@etu.hesge.ch"
 __date__ = "12/06/2021"
 
 FILEPATH_DATASETS: str = 'datasets'
-FOLDER_MODEL: str = 'model'
+FILEPATH_MODELS: str = 'model'  # don't put precious folder @see delete_model()
 FILENAME_MODEL: str = 'model.json'
 STEP = 20
 CHARACTER_LIST = "0123456789"
@@ -80,33 +83,27 @@ def load_model(filepath: str = '') -> None:
     filepath -- path to the given model to load
     """
     print("load_model")
-    if(filepath == ''):
-        model = tf.keras.applications.MobileNetV2(weights="imagenet")
-    else:
-        with open(filepath, 'r') as f:
-            model = model_from_json(f.read())
-    print(" -> Chargement du modèle")
+    filepath = FILEPATH_MODELS + '/' + filepath
+    if(not os.path.exists(filepath)):
+        print("  -> load_model: model does not exist or path is incorrect")
+        return None
+    model = keras.models.load_model(filepath)
     return model
 
 
-def unload_model(model_to_unload, filepath: str = 'model.json') -> None:
+def unload_model(model_to_unload, filepath: str = 'model') -> None:
     """ Unload model into given filepath
 
     TODO this shit
 
     Params
     model_to_unload -- keras model to save
-    filepath -- place to save the model
+    filepath -- name of file
     """
     print("unload_model")
-    print(" -> Déchargement du modèle dans fichier ", filepath,
-          ", dossier ", FILEPATH_DATASETS + filepath)
-    filepath = FILEPATH_DATASETS + filepath
-    if(model_to_unload is not None):
-        with open(filepath, 'w+') as f:
-            f.write(model_to_unload)
-    else:
-        print("Problème avec le modèle")
+    if(not os.path.exists(FILEPATH_MODELS)):
+        os.mkdir(FILEPATH_MODELS)
+    model_to_unload.save(FILEPATH_MODELS + '/' + filepath)
 
 
 def load_images() -> List[Tuple[str, List[int]]]:
@@ -180,3 +177,29 @@ def unload_image(matrix: List[List[int]], character: str = '0') -> None:
         new_file.seek(0)
         json.dump(previousData, new_file)
         new_file.close()
+
+
+def delete_model() -> bool:
+    """ Delete model
+
+    Return
+    True on deletion
+    """
+    print("delete_model")
+    if(not os.path.exists(FILEPATH_MODELS)):
+        print("  -> delete_model : file already deleted")
+        return False
+    shutil.rmtree(FILEPATH_MODELS)
+
+
+def delete_datasets() -> bool:
+    """ Delete datasets
+
+    Return
+    True on deletion
+    """
+    print("delete_datasets")
+    if(not os.path.exists(FILEPATH_DATASETS)):
+        print("  -> delete_dataset : file already deleted")
+        return False
+    shutil.rmtree(FILEPATH_DATASETS)

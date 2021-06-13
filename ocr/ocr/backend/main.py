@@ -45,7 +45,13 @@ except FileNotFoundError:
 
 @app.post('/add')
 async def add(item: Item):
-    res = ir.unload_image(item.content, item.title)
+    print("main.py => add -> received char ",
+          item.title, " and content \n ")
+    ir.print_matrix(item.title, item.content)
+    features = ir.matrix_2_list(item.content)
+    print("main.py => add -> converted to list\n")
+    ir.print_list(item.title, features)
+    res = ir.unload_image(features, item.title)
 
 
 @app.post('/train')
@@ -53,16 +59,19 @@ def train():
     print("ROUTES => app. post/train")
     print("  -> Training model from images list")
     training_list = ir.load_images()
-    print("  -> Result from load_images", )
-    ir.print_list_tuple(training_list)
+    print(training_list)
+    print(len(training_list))  # => list of tuple
+    print(len(training_list[0]))  # => tuple
+    print(len(training_list[0][0]))  # => char
+    print(len(training_list[0][1]))  # => list
     labels, features = ip.get_features_labels(training_list)
-    labels, features = ip.convert_characters(labels, features)
-    model = ir.load_model()
-    if(model == None):
-        print("Model wasn't created, initiating model")
-        model = tf.keras.Sequential()
-        model = ip.train(labels, features)
-        # TODO train existing model
+    print(len(features))
+    print(len(features[0]))
+    print(len(features[1]))
+    #labels, features = ip.convert_characters(labels, features)
+    #model = tf.keras.Sequential()
+    #print("mes couilles", features.shape)
+    #model = ip.train(labels, features, model)
     return
 
 
@@ -70,6 +79,12 @@ def train():
 async def predict(item: Item):
     print("Trying to predict image using model")
     print(item)
+    model = ir.load_model()
+    if(model == None):
+        print("Model wasn't created, initiating model by calling train")
+        train()
+        ip.predict(item)
+
     return item
 
 

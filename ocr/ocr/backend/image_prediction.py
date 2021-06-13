@@ -18,11 +18,12 @@ __author__ = "Xavier Perret"
 __email__ = "xavier.perret@etu.hesge.ch"
 __date__ = "12/06/2021"
 
+MODEL_FILENAME: str = 'wow_much_model'
 CANVAS_SIZE: int = 400
 NEURAL_NUMBER: int = 150
 CHARACTER_NUMBER: int = 10
 CHARACTER_LIST = "0123456789"
-EPOCHS: int = 3
+EPOCHS: int = 3  # number of time we train model on our data set
 
 
 def predict(image_list: List[int], model) -> List[List[float]]:
@@ -48,6 +49,13 @@ def get_features_labels(images_list: List[Tuple[str, List[int]]]) -> Tuple[List[
 
 def convert_characters(labels: List[str], features: List[List[int]]) -> Tuple[np.ndarray, np.ndarray]:
     """ Code labels and convert labels and features into np.ndarray and returns them
+
+    Params
+    labels -- list of characters to be encoded
+    features -- corresponding data to be converted to np.ndarray
+
+    Return
+    labels, features as np.ndarray
     """
     character_coding: np.array = np.zeros(CHARACTER_NUMBER)
     characters_coding: np.ndarray = np.ndarray([CHARACTER_NUMBER, len(labels)])
@@ -78,5 +86,6 @@ def train(labels: List[str], features: List[List[int]], model: tf.keras.Model) -
     model.summary()
     model.fit(features, labels, epochs=EPOCHS,
               batch_size=len(features))
+    ir.unload_model(model, MODEL_FILENAME)
 
     return model

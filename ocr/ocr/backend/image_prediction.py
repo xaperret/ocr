@@ -10,6 +10,7 @@ import numpy as np
 import tensorflow as tf
 from keras.models import model_from_json
 from keras.layers import Activation, Dense
+from keras.utils import np_utils, generic_utils
 from tensorflow import keras
 from tensorflow.keras.applications.imagenet_utils import decode_predictions
 
@@ -47,14 +48,12 @@ def get_features_labels(images_list: List[Tuple[str, List[int]]]) -> Tuple[List[
     Tuple(labels:str, features:matrice de int)
     """
     labels: List[str] = []
-    features: List[List[int]] = [[]]
+    features: List[List[int]] = []
     for element in images_list:
         label, feature = element
         labels.append(label)
         features.append(feature)
 
-    labels.pop(0)
-    features.pop(0)
     return labels, features
 
 
@@ -71,19 +70,19 @@ def convert_characters(labels: List[str], features: List[List[int]]) -> Tuple[np
     print("convert_characters")
     character_coding: np.array = np.zeros(CHARACTER_NUMBER)
     characters_coding: np.ndarray = np.ndarray(
-        [CHARACTER_NUMBER, len(labels)])
+        [len(labels), CHARACTER_NUMBER])
     index: int = 0
     for i, char in enumerate(labels):
         index = CHARACTER_LIST.find(char)
         character_coding[index] = 1
         for j in range(0, len(character_coding)):
-            characters_coding[j, i] = character_coding[j]
+            characters_coding[i, j] = character_coding[j]
         character_coding[index] = 0
     print("  -> convert_characters: result of operation is ", characters_coding)
     return characters_coding, np.array(features)
 
 
-def train(labels: List[str], features: List[List[int]], model: tf.keras.Model) -> tf.keras.Model:
+def train(labels: np.ndarray, features: np.ndarray, model: tf.keras.Model) -> tf.keras.Model:
     """ Create and train a model with given dataset and returns it
 
     Params
@@ -91,14 +90,15 @@ def train(labels: List[str], features: List[List[int]], model: tf.keras.Model) -
     model --
     """
     print("train")
-    model.add(Dense(CANVAS_SIZE))
+    model.add(Dense(features.shape[1]))
     model.add(Dense(NEURAL_NUMBER, activation='relu'))
     model.add(Dense(CHARACTER_NUMBER, activation='softmax'))
     model.compile(
-        optimizer='rmsprop', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        optimizer='adam', loss='mse', metrics=['accuracy'])
     print("  -> train summary")
-    model.fit(features, labels, epochs=EPOCHS,
-              batch_size=len(features))
+    print("La taille de label ", labels.shape, " et features ", features.shape)
+    model.fit(x=features, y=labels, epochs=EPOCHS,
+              batch_size=(features.shape[0]))
     model.summary()
     ir.unload_model(model, MODEL_FILENAME)
 

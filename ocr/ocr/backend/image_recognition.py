@@ -86,7 +86,6 @@ def load_model() -> None:
     filepath -- path to the given model to load
     """
     print("load_model")
-    filepath = FILEPATH_MODELS + '/' + MODEL_FILENAME
     model = tf.keras.models.load_model('models.h5')
     return model
 

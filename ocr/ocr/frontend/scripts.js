@@ -3,6 +3,11 @@
 /**
  * ! GLOBAL VARIABLE !
  */
+var chartHtml = document.getElementById("predictChart");
+chartHtml.classList.add("hidden");
+chartHtml.width = 0;
+chartHtml.height = 0;
+
 /* ! API RELATED ! */
 const apiURL = "http://127.0.0.1:8000";
 
@@ -25,6 +30,18 @@ for (let i = 0; i < canvasSize; i++) {
 /**
  * ! FUNCTIONS !
  */
+function hideChartHtml(hide) {
+  if (hide) {
+    chartHtml.className = "hidden";
+    chartHtml.width = 0;
+    chartHtml.height = 0;
+  } else {
+    chartHtml.className = "";
+    chartHtml.width = 400;
+    chartHtml.height = 400;
+  }
+}
+
 function addImage() {
   let apiCall = apiURL + "/add";
   console.log("Making request to ", apiCall);
@@ -39,6 +56,7 @@ function addImage() {
   });
 
   clearDrawing();
+  hideChartHtml(true);
 }
 
 function trainModel() {
@@ -48,6 +66,7 @@ function trainModel() {
   fetch(apiCall, {
     method: "POST",
   });
+  hideChartHtml(true);
 }
 
 function predictFromModel() {
@@ -57,10 +76,12 @@ function predictFromModel() {
   let data = { title: "", content: matrixOCR };
   console.log("Containing ", data);
 
+  let labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
   fetch(apiCall, {
     method: "POST",
     body: JSON.stringify(data),
-  });
+  }).then(  hideChartHtml(false);
 }
 
 function deleteModel() {

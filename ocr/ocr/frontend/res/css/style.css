@@ -22,3 +22,7 @@ form {
 .btn {
     width: 45vw;
 }
+
+.hidden {
+    display: none;
+}

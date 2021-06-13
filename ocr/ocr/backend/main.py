@@ -8,13 +8,14 @@ import numpy as np
 
 import tensorflow as tf
 import uvicorn
-from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from starlette.responses import FileResponse
 
 import image_recognition as ir
 import image_prediction as ip
+import json
 
 __author__ = "Xavier Perret"
 __email__ = "xavier.perret@etu.hesge.ch"
@@ -24,6 +25,19 @@ FOLDER_MODEL: str = 'model'
 FILENAME_MODEL: str = 'model.json'
 
 app = FastAPI(title='TP3 de vision numérique')
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class Item(BaseModel):
@@ -63,16 +77,12 @@ async def predict(item: Item):
         print("Model wasn't created, initiating model by calling train")
         train()
     features = ir.matrix_2_list(item.content)
-    print(len(features))
     features = np.array(features)
     features = np.reshape(features, [1, 400])
-    print(features.shape)
-    print(features)
-    res = model.predict(features)
-    for i in res:
-        for j, element in enumerate(i):
-            print(j, ':', element)
-    return item
+    res = model.predict(features)[0, :]
+    print(res)
+    res = json.dumps(res.tolist())
+    return JSONResponse(content=res)
 
 
 @app.delete('/deleteModel')

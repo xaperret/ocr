@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Set, Tuple
 import numpy as np
 import tensorflow as tf
 from keras.models import model_from_json
+from keras.layers import Activation, Dense
 from tensorflow import keras
 from tensorflow.keras.applications.imagenet_utils import decode_predictions
 
@@ -31,7 +32,7 @@ def predict(image_list: List[int], model) -> List[List[float]]:
 
     Params
     image_list -- 2d list of integer containing the value of the image
-    model -- 
+    model --
     """
     return [[]]
 
@@ -41,9 +42,19 @@ def get_features_labels(images_list: List[Tuple[str, List[int]]]) -> Tuple[List[
 
     Params
     images_list -- contains all images and their character they are representing
+
+    Returns
+    Tuple(labels:str, features:matrice de int)
     """
-    features = [i[1] for i in images_list]
-    labels = [i[0] for i in images_list]
+    labels: List[str] = []
+    features: List[List[int]] = [[]]
+    for element in images_list:
+        label, feature = element
+        labels.append(label)
+        features.append(feature)
+
+    labels.pop(0)
+    features.pop(0)
     return labels, features
 
 
@@ -57,15 +68,18 @@ def convert_characters(labels: List[str], features: List[List[int]]) -> Tuple[np
     Return
     labels, features as np.ndarray
     """
+    print("convert_characters")
     character_coding: np.array = np.zeros(CHARACTER_NUMBER)
-    characters_coding: np.ndarray = np.ndarray([CHARACTER_NUMBER, len(labels)])
+    characters_coding: np.ndarray = np.ndarray(
+        [CHARACTER_NUMBER, len(labels)])
     index: int = 0
-    for char in labels:
+    for i, char in enumerate(labels):
         index = CHARACTER_LIST.find(char)
         character_coding[index] = 1
-        characters_coding.append(character_coding)
+        for j in range(0, len(character_coding)):
+            characters_coding[j, i] = character_coding[j]
         character_coding[index] = 0
-
+    print("  -> convert_characters: result of operation is ", characters_coding)
     return characters_coding, np.array(features)
 
 
@@ -83,9 +97,9 @@ def train(labels: List[str], features: List[List[int]], model: tf.keras.Model) -
     model.compile(
         optimizer='rmsprop', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     print("  -> train summary")
-    model.summary()
     model.fit(features, labels, epochs=EPOCHS,
               batch_size=len(features))
+    model.summary()
     ir.unload_model(model, MODEL_FILENAME)
 
     return model

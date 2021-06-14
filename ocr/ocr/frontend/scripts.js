@@ -32,10 +32,12 @@ for (let i = 0; i < canvasSize; i++) {
  */
 function hideChartHtml(hide) {
   if (hide) {
+    console.log("hideChartHtml -> true");
     chartHtml.className = "hidden";
     chartHtml.width = 0;
     chartHtml.height = 0;
   } else {
+    console.log("hideChartHtml -> false");
     chartHtml.className = "";
     chartHtml.width = 400;
     chartHtml.height = 400;
@@ -81,7 +83,40 @@ function predictFromModel() {
   fetch(apiCall, {
     method: "POST",
     body: JSON.stringify(data),
-  }).then(  hideChartHtml(false);
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      data = data.split(" ").join();
+      data = data.split("[").join();
+      data = data.split("]").join();
+      data = data.split(",").filter((x) => x != "");
+      data = data.map((x) => parseFloat(x));
+      console.log(data);
+      let backgroundColors = data.map((element) => "rgba(163, 190, 140, 0.2)");
+      let max = -1;
+      let tmp = -1;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] > max) {
+          max = data[i];
+          tmp = i;
+        }
+      }
+      backgroundColors[tmp] = "rgba(163, 190, 140, 1)";
+      const predictChart = new Chart(chartHtml, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "My First Dataset",
+              data: data,
+              backgroundColor: backgroundColors,
+            },
+          ],
+        },
+      });
+    });
+  hideChartHtml(false);
 }
 
 function deleteModel() {
@@ -206,6 +241,7 @@ function clearDrawing() {
     ctx.stroke();
   }
   clearMatrix(matrixOCR);
+  hideChartHtml(true);
 }
 
 function printMatrix(mat) {

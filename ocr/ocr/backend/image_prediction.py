@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Does all the ai training and prediction using image_recognition as helper to open/close read/write json files
+"""Does all the ai training
+using image_recognition as helper to open/close read/write csv files
 
 """
 
@@ -23,7 +24,7 @@ __date__ = "12/06/2021"
 FILENAME_DATASETS: str = 'datasets.csv'
 FILEPATH_DATASETS: str = 'datasets'
 CANVAS_SIZE: int = 400
-NEURAL_NUMBER: int = 400
+NEURAL_NUMBER: int = 128
 CHARACTER_NUMBER: int = 10
 CHARACTER_LIST = "0123456789"
 EPOCHS: int = 3  # number of time we train model on our data set
@@ -73,12 +74,13 @@ def convert_characters(labels: List[str], features: List[List[int]]) -> Tuple[np
     return characters_coding, np.array(features)
 
 
-def train(labels: np.ndarray, features: np.ndarray, model: tf.keras.Model) -> tf.keras.Model:
-    """ Create and train a model with given dataset and returns it
+def train(labels: np.ndarray, features: np.ndarray, model: tf.keras.Model) -> None:
+    """ Create and train a model with given dataset and saves it
 
     Params
-    image_list --
-    model --
+    labels -- the solution
+    features -- the data to use to train/predict
+    model -- the keras model
     """
     print("train")
     model.add(keras.layers.InputLayer(features.shape[1]))

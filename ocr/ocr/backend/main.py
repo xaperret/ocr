@@ -47,6 +47,11 @@ class Item(BaseModel):
 
 @app.post('/add')
 async def add(item: Item):
+    """ Add given data from client to datasets.csv
+
+    Params
+    item -- json containing matrix and character that has been drawn
+    """
     print("main.py => add -> received char ",
           item.title, " and content \n ")
     ir.print_matrix(item.title, item.content)
@@ -58,6 +63,9 @@ async def add(item: Item):
 
 @app.post('/train')
 def train():
+    """ Train model using data found in 'datasets/datasets.csv'
+    and store model into current directory/model.h5
+    """
     print("ROUTES => app. post/train")
     print("  -> Training model from images list")
     training_list = ir.load_images()
@@ -65,11 +73,19 @@ def train():
     labels, features = ip.convert_characters(labels, features)
     model = tf.keras.Sequential()
     ip.train(labels, features, model)
-    return
 
 
 @app.post('/predict')
 async def predict(item: Item):
+    """ Load Model if model doesn't exist will call train function
+    then try to predict using given model, print result and returns to the client
+
+    Param
+    item -- json given by client
+
+    Return
+    JSON containing the result
+    """
     print("Trying to predict image using model")
     print(item)
     model = ir.load_model()

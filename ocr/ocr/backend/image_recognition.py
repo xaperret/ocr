@@ -69,6 +69,9 @@ def matrix_2_list(matrix: List[List[int]]) -> List[int]:
 
     Params
     matrix -- given 2d matrix to convert
+
+    Return
+    list of integer
     """
     print("matrix_2_list")
     new_list: List[int] = []
@@ -77,13 +80,14 @@ def matrix_2_list(matrix: List[List[int]]) -> List[int]:
     return new_list
 
 
-def load_model() -> None:
+def load_model():
     """ Load and return given model
-
-    TODO this shit
 
     Params
     filepath -- path to the given model to load
+
+    Return
+    Model
     """
     print("load_model")
     model = tf.keras.models.load_model('models.h5')
@@ -92,8 +96,6 @@ def load_model() -> None:
 
 def unload_model(model_to_unload, filepath: str = 'model') -> None:
     """ Unload model into given filepath
-
-    TODO this shit
 
     Params
     model_to_unload -- keras model to save

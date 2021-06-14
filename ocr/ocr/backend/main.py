@@ -80,7 +80,15 @@ async def predict(item: Item):
     features = np.array(features)
     features = np.reshape(features, [1, 400])
     res = model.predict(features)[0, :]
-    print(res)
+    tmp: float = -1
+    c_tmp: int = -1
+    for i, element in enumerate(res):
+        print("char:", i, " => ", " prob:", element)
+        if(tmp < element):
+            tmp = element
+            c_tmp = i
+    print("Le plus probable est ", c_tmp)
+
     res = json.dumps(res.tolist())
     return JSONResponse(content=res)
 

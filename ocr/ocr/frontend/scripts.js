@@ -3,11 +3,6 @@
 /**
  * ! GLOBAL VARIABLE !
  */
-var chartHtml = document.getElementById("predictChart");
-chartHtml.classList.add("hidden");
-chartHtml.width = 0;
-chartHtml.height = 0;
-
 /* ! API RELATED ! */
 const apiURL = "http://127.0.0.1:8000";
 
@@ -30,20 +25,26 @@ for (let i = 0; i < canvasSize; i++) {
 /**
  * ! FUNCTIONS !
  */
-function hideChartHtml(hide) {
-  if (hide) {
+
+/**
+ * This function either destroy(true) or create(false) a canvas
+ *
+ * @param {* boolean} destroyCreate
+ */
+function destroyChart(destroyCreate) {
+  if (destroyCreate) {
     console.log("hideChartHtml -> true");
-    chartHtml.className = "hidden";
-    chartHtml.width = 0;
-    chartHtml.height = 0;
+    document.getElementById("predictChart").remove();
   } else {
-    console.log("hideChartHtml -> false");
-    chartHtml.className = "";
-    chartHtml.width = 400;
-    chartHtml.height = 400;
+    let chart = document.createElement("canvas");
+    chart.setAttribute("id", "predictChart");
+    document.querySelector("main").appendChild(chart);
   }
 }
 
+/**
+ * This function takes the matrixOCR that has been filled and send it to the api
+ */
 function addImage() {
   let apiCall = apiURL + "/add";
   console.log("Making request to ", apiCall);
@@ -58,9 +59,12 @@ function addImage() {
   });
 
   clearDrawing();
-  hideChartHtml(true);
+  destroyChart(true);
 }
 
+/**
+ * This function ask the backend to train the model
+ */
 function trainModel() {
   let apiCall = apiURL + "/train";
   console.log("Making request to ", apiCall);
@@ -68,9 +72,16 @@ function trainModel() {
   fetch(apiCall, {
     method: "POST",
   });
-  hideChartHtml(true);
+  destroyChart(true);
 }
 
+/**
+ * This function send the matrixOCR (drawings) and ask api to make a prediction
+ *
+ * This will make a call to the backend so that it makes a prediction based
+ * upon the given data. It will then create a chart based on the response the
+ * backend has given
+ */
 function predictFromModel() {
   let apiCall = apiURL + "/predict";
   console.log("Making request to ", apiCall);
@@ -79,6 +90,7 @@ function predictFromModel() {
   console.log("Containing ", data);
 
   let labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  destroyChart(false);
 
   fetch(apiCall, {
     method: "POST",
@@ -102,7 +114,7 @@ function predictFromModel() {
         }
       }
       backgroundColors[tmp] = "rgba(163, 190, 140, 1)";
-      const predictChart = new Chart(chartHtml, {
+      const predictChart = new Chart(document.getElementById("predictChart"), {
         type: "bar",
         data: {
           labels: labels,
@@ -116,25 +128,7 @@ function predictFromModel() {
         },
       });
     });
-  hideChartHtml(false);
-}
-
-function deleteModel() {
-  let apiCall = apiURL + "/deleteModel";
-  console.log("Making request to ", apiCall);
-
-  fetch(apiCall, {
-    method: "DELETE",
-  });
-}
-
-function deleteDatasets() {
-  let apiCall = apiURL + "/deleteDatasets";
-  console.log("Making request to ", apiCall);
-
-  fetch(apiCall, {
-    method: "DELETE",
-  });
+  destroyChart(false);
 }
 
 /**
@@ -152,29 +146,56 @@ function makeDivisibleBy20(size) {
   return size;
 }
 
+/**
+ * This function refreshes the global variable containing the client mouse position
+ * @param {*} e
+ *
+ * @see end of script.js to see how is added this function
+ */
 function refreshCoords(e) {
   coords.x = e.clientX - canvasOCR.offsetLeft;
   coords.y = e.clientY - canvasOCR.offsetTop;
   console.log(e);
 }
 
+/**
+ * As long as the client's mouse is on the canvas it will call this function
+ * @param {*} e
+ *
+ * @see end of script.js to see how is added this function
+ */
 function startDrawing(e) {
   document.addEventListener("mousemove", mouseIsMoving);
   refreshCoords(e);
   drawSquare();
 }
-
+/**
+ * Useful to keep track of the mouse when holding down the button mouse
+ * @param {*} e
+ *
+ * @see end of script.js to see how is added this function
+ */
 function mouseIsMoving(e) {
   refreshCoords(e);
   drawSquare();
 }
 
+/**
+ * @see end of script.js to see how is added this function
+ */
 function endDrawing() {
   document.removeEventListener("mousemove", mouseIsMoving);
 }
 
-function resizeDrawing(e) {}
-
+/**
+ * This function will draw a square at the client's mouse position or fill one of the grid squares
+ * if given x/yPixel
+ *
+ * @param {string} color
+ * @param {int} xPixel
+ * @param {int} yPixel
+ * @returns
+ */
 function drawSquare(color = "black", xPixel = -1, yPixel = -1) {
   console.log("drawSquare called ");
 
@@ -218,6 +239,9 @@ function drawSquare(color = "black", xPixel = -1, yPixel = -1) {
   matrixOCR[col][li] = 1;
 }
 
+/**
+ * Clear the content of both the canvas and matrix ocr
+ */
 function clearDrawing() {
   for (let i = 0; i < canvasSize; i++) {
     for (let j = 0; j < canvasSize; j++) {
@@ -241,9 +265,13 @@ function clearDrawing() {
     ctx.stroke();
   }
   clearMatrix(matrixOCR);
-  hideChartHtml(true);
+  destroyChart(true);
 }
 
+/**
+ * Print the matrix
+ * @param {*} mat
+ */
 function printMatrix(mat) {
   let s = "";
   let i = 0;
@@ -258,6 +286,10 @@ function printMatrix(mat) {
   });
 }
 
+/**
+ * Clear the content of the matrix
+ * @param {*} mat
+ */
 function clearMatrix(mat) {
   console.log("Matrix cleared");
   mat.forEach((element) => {
@@ -266,6 +298,10 @@ function clearMatrix(mat) {
   printMatrix(mat);
 }
 
+/**
+ * Draw a line, deprecated
+ * @param {*} event
+ */
 function draw(event) {
   ctx.beginPath();
   ctx.lineWidth = 5;
@@ -374,4 +410,3 @@ for (let i = 0; i < canvasOCR.width + 1; i = i + step) {
 canvasOCR.addEventListener("mousedown", (e) => startDrawing(e));
 canvasOCR.addEventListener("mouseup", endDrawing);
 canvasOCR.addEventListener("focusout", endDrawing);
-//canvasOCR.addEventListener("resize", (e) => resizeDrawing(e));

@@ -1,4 +1,4 @@
-# Laboratoire 3 de vision numérique : OCR
+# OCR
 
 ## Général
 
